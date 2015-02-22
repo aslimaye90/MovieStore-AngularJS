@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include ../partials/head %>
+  </head>
+  <body>
+  	<div class="container">
+	  	<header>
+	        <% include ../partials/header %>
+	    </header>
+
+      <div ng-app="" ng-controller="pageNumberController">
+        <form novalidate>
+          <p style="margin-top: 20px"><b>Total Pages = {{totalPages}}</b></p>
+
+          <span style="float: left; width: 33%">
+            <p><b>Navigate to page number: </b></p>
+            <input type="number" ng-model="goToPageNumber">
+            <input type="button" ng-click="callSpecificPage()" value="GO!">
+          </span>
+
+          <span style="float: left; width: 33%">
+            <p><b>Search this page: </b></p>
+            <input type="text">
+          </span>
+          
+          <span style="float: left; width: 33%">
+            <p><b>Search full Database: </b></p>
+            <input type="text" ng-model="firstFewLetters">
+            <input type="button" ng-click="nameSearch()" value="GO!">
+          </span>
+        </form>
+      </div>
+
+      <br>
+
+      <div ng-app="" ng-controller="tableController">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+                <th data-field="number" data-halign="left" data-align="right">Number</th>
+                <th data-field="name" data-halign="center" data-align="left">Movie Name</th>
+                <th data-field="category" data-halign="center" data-align="left">Category</th>
+            </tr>
+          </thead>
+
+          
+
+          <tbody>
+            <tr ng-repeat="x in tableData">
+              <td>2</td>
+              <td>{{ x.MovieName }}</td>
+              <td>{{ x.category }}</td>
+            </tr>
+          </tbody>
+          
+        </table>
+      </div>
+
+      <script>
+
+        function pageNumberController($scope){
+          $scope.Math = window.Math;
+          $scope.totalPages = $scope.Math.ceil(<%=rows%>/100);
+
+          $scope.callSpecificPage = function(){
+            var form = document.createElement("form");
+            form.setAttribute("method", "GET");
+            form.setAttribute("action", "/movies");
+
+            var hiddenField = document.createElement("input");
+            hiddenField.setAttribute("type", "hidden");
+            hiddenField.setAttribute("name", "pageNumber");
+            hiddenField.setAttribute("value", $scope.goToPageNumber);
+
+            form.appendChild(hiddenField);
+            document.body.appendChild(form);
+            form.submit();
+          };
+
+          $scope.nameSearch = function(){
+
+          };
+        };
+
+        function tableController($scope){
+          $scope.tableData = <%=data%>;
+        };
+
+      </script>
+	    
+	</div>
+  </body>
+
+  <footer>
+        <% include ../partials/footer %>
+  </footer>
+</html>
