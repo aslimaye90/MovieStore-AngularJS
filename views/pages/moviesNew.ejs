@@ -3,15 +3,15 @@
   <head>
     <% include ../partials/head %>
   </head>
-  <body>
-  	<div class="container">
+  <body ng-app>
+  	<div class="container" ng-controller="allControllers">
 	  	<header>
 	        <% include ../partials/header %>
 	    </header>
 
       <div>
         <form novalidate>
-          <p style="margin-top: 20px"><b>Total Pages = <%=rowCount%></b></p>
+          <p style="margin-top: 20px"><b>Total Pages = {{totPages}}</b></p>
 
           <span style="float: left; width: 33%">
             <p><b>Navigate to page number: </b></p>
@@ -21,7 +21,7 @@
 
           <span style="float: left; width: 33%">
             <p><b>Search this page: </b></p>
-            <input type="text">
+            <input input type="text" ng-model="searchMovies">
           </span>
           
           <span style="float: left; width: 33%">
@@ -34,7 +34,7 @@
 
       <br>
 
-      <div ng-app="" ng-controller="tableController">
+      <div>
         <table class="table table-striped">
           <thead>
             <tr>
@@ -45,10 +45,10 @@
           </thead>
           
           <tbody>
-            <tr ng-repeat="x in tableData">
-              <td>$index+1</td>
-              <td>{{ x.MovieName }}</td>
-              <td>{{ x.category }}</td>
+            <tr ng-repeat="x in tableData | filter:searchMovies">
+              <td>{{$index+1}}</td>
+              <td>{{x.MovieName}}</td>
+              <td>{{x.category}}</td>
             </tr>
           </tbody>
           
@@ -56,8 +56,11 @@
       </div>
 
       <script>
-        function tableController($scope){
-          $scope.tableData = <%=data%>;
+        function allControllers($scope){
+          $scope.Math = window.Math;
+          $scope.totPages = $scope.Math.ceil(<%=rowCount%>/100);
+
+          $scope.tableData = <%-JSON.stringify(data)%>;
         }
       </script>
 	    
