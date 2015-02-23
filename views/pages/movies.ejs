@@ -3,38 +3,38 @@
   <head>
     <% include ../partials/head %>
   </head>
-  <body>
-  	<div class="container">
+  <body ng-app>
+  	<div class="container" ng-controller="allControllers">
 	  	<header>
 	        <% include ../partials/header %>
 	    </header>
 
-      <div ng-app="" ng-controller="pageNumberController">
+      <div>
         <form novalidate>
-          <p style="margin-top: 20px"><b>Total Pages = {{totalPages}}</b></p>
+          <p style="margin-top: 20px"><b>Total Pages = {{totPages}}</b></p>
 
           <span style="float: left; width: 33%">
             <p><b>Navigate to page number: </b></p>
-            <input type="number" ng-model="goToPageNumber">
-            <input type="button" ng-click="callSpecificPage()" value="GO!">
+            <input type="number" ng-model="goToThisPage">
+            <input type="button" ng-click="specificPage()" value="GO!">
           </span>
 
           <span style="float: left; width: 33%">
             <p><b>Search this page: </b></p>
-            <input type="text">
+            <input input type="text" ng-model="searchMoviesOnCurrentPage">
           </span>
           
           <span style="float: left; width: 33%">
             <p><b>Search full Database: </b></p>
-            <input type="text" ng-model="firstFewLetters">
-            <input type="button" ng-click="nameSearch()" value="GO!">
+            <input type="text" ng-model="searchText">
+            <input type="button" ng-click="searchFullDB()" value="GO!">
           </span>
         </form>
       </div>
 
       <br>
 
-      <div ng-app="" ng-controller="tableController">
+      <div>
         <table class="table table-striped">
           <thead>
             <tr>
@@ -43,14 +43,12 @@
                 <th data-field="category" data-halign="center" data-align="left">Category</th>
             </tr>
           </thead>
-
           
-
           <tbody>
-            <tr ng-repeat="x in tableData">
-              <td>2</td>
-              <td>{{ x.MovieName }}</td>
-              <td>{{ x.category }}</td>
+            <tr ng-repeat="x in tableData | filter:searchMoviesOnCurrentPage">
+              <td>{{$index+1}}</td>
+              <td>{{x.MovieName}}</td>
+              <td>{{x.category}}</td>
             </tr>
           </tbody>
           
@@ -58,35 +56,49 @@
       </div>
 
       <script>
-
-        function pageNumberController($scope){
+        function allControllers($scope, $http){
           $scope.Math = window.Math;
-          $scope.totalPages = $scope.Math.ceil(<%=rows%>/100);
+          $scope.totPages = $scope.Math.ceil(<%=rowCount%>/100);
 
-          $scope.callSpecificPage = function(){
-            var form = document.createElement("form");
-            form.setAttribute("method", "GET");
-            form.setAttribute("action", "/movies");
+          $scope.tableData = <%-JSON.stringify(data)%>;
 
-            var hiddenField = document.createElement("input");
-            hiddenField.setAttribute("type", "hidden");
-            hiddenField.setAttribute("name", "pageNumber");
-            hiddenField.setAttribute("value", $scope.goToPageNumber);
-
-            form.appendChild(hiddenField);
-            document.body.appendChild(form);
-            form.submit();
+          $scope.searchFullDB = function() {
+            if(typeof $scope.searchText === 'undefined' || $scope.searchText === ""){}
+            else{
+              var response = $http.get('/movies/'+$scope.searchText);
+              response.success(function(data, status, headers, config) {
+                $scope.tableData = data.data;
+                $scope.totPages = $scope.Math.ceil(data.totRows/100);
+              });
+              response.error(function(data, status, headers, config) {
+              });
+            }
           };
 
-          $scope.nameSearch = function(){
-
+          $scope.specificPage = function() {
+            if(typeof $scope.goToThisPage === 'undefined' || $scope.goToThisPage === ""){}
+            else{
+              if(typeof $scope.searchText === 'undefined' || $scope.searchText === ""){
+                var response = $http.get('/movies/secret987asdhfqpw8oapi/'+($scope.goToThisPage-1)*100);
+                response.success(function(data, status, headers, config) {
+                  $scope.tableData = data.data;
+                  $scope.totPages = $scope.Math.ceil(data.totRows/100);
+                });
+                response.error(function(data, status, headers, config) {
+                });
+              }
+              else{
+                var response = $http.get('/movies/'+$scope.searchText+'/'+($scope.goToThisPage-1)*100);
+                response.success(function(data, status, headers, config) {
+                  $scope.tableData = data.data;
+                  $scope.totPages = $scope.Math.ceil(data.totRows/100);
+                });
+                response.error(function(data, status, headers, config) {
+                });
+              }
+            }
           };
-        };
-
-        function tableController($scope){
-          $scope.tableData = <%=data%>;
-        };
-
+        }
       </script>
 	    
 	</div>
