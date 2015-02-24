@@ -4,7 +4,7 @@
     <% include ../partials/head %>
   </head>
   
-  <body ng-app='myApp'>
+  <body class="container" ng-app='myApp'>
   	
     <div ng-controller="ctrl1">
         <input type="text" ng-model="firstName">
@@ -47,7 +47,7 @@
         myApp.controller('ctrl2', function ($scope, Data) {
             $scope.$watch(function(){return Data.getFirstName();}, function(newVal){
               if(newVal){$scope.firstName = newVal;}
-            })
+            });
         });
     </script>
 	    

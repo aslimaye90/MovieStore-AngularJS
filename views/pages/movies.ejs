@@ -3,13 +3,13 @@
   <head>
     <% include ../partials/head %>
   </head>
-  <body ng-app>
-  	<div class="container" ng-controller="allControllers">
+  <body ng-app='MoviePageModule'>
+  	<div class="container">
 	  	<header>
 	        <% include ../partials/header %>
 	    </header>
 
-      <div>
+      <div ng-controller="inputsController">
         <form novalidate>
           <p style="margin-top: 20px"><b>Total Pages = {{totPages}}</b></p>
 
@@ -21,7 +21,7 @@
 
           <span style="float: left; width: 33%">
             <p><b>Search this page: </b></p>
-            <input input type="text" ng-model="searchMoviesOnCurrentPage">
+            <input input type="text" ng-model="search.moviesOnCurrentPage">
           </span>
           
           <span style="float: left; width: 33%">
@@ -34,7 +34,7 @@
 
       <br>
 
-      <div>
+      <div ng-controller="tableController">
         <table class="table table-striped">
           <thead>
             <tr>
@@ -56,24 +56,62 @@
       </div>
 
       <script>
-        function allControllers($scope, $http){
-          $scope.Math = window.Math;
-          $scope.totPages = $scope.Math.ceil(<%=rowCount%>/100);
+        
+        var MoviePageModule = angular.module('MoviePageModule', []);
 
-          $scope.tableData = <%-JSON.stringify(data)%>;
+        MoviePageModule.factory('sharedDataFactory', function () {
+            var data = {
+              searchMoviesOnCurrentPage: '',
+              tableData: ''
+            };
+            return {
+                getSearchMoviesOnCurrentPage: function () {
+                    return data.searchMoviesOnCurrentPage;
+                },
+                setSearchMoviesOnCurrentPage: function (x) {
+                    data.searchMoviesOnCurrentPage = x;
+                },
+                getTableData: function () {
+                    return data.tableData;
+                },
+                setTableData: function (x) {
+                    data.tableData = x;
+                }
+            };
+        });
+
+
+
+        MoviePageModule.controller('inputsController', function($scope, $http, sharedDataFactory){
+          
+          function init(){
+            $scope.Math = window.Math;
+            $scope.totPages = $scope.Math.ceil(<%=rowCount%>/100);
+            sharedDataFactory.setTableData(<%-JSON.stringify(data)%>);
+          }
+
+          init();
+
+          $scope.search = {};
+          $scope.$watch('search.moviesOnCurrentPage', function(newVal){
+            if(newVal){sharedDataFactory.setSearchMoviesOnCurrentPage(newVal);}
+          });
 
           $scope.searchFullDB = function() {
             if(typeof $scope.searchText === 'undefined' || $scope.searchText === ""){}
             else{
               var response = $http.get('/movies/'+$scope.searchText);
               response.success(function(data, status, headers, config) {
-                $scope.tableData = data.data;
+                /*$scope.tableData = data.data;*/
                 $scope.totPages = $scope.Math.ceil(data.totRows/100);
+
+                sharedDataFactory.setTableData(data.data);
               });
               response.error(function(data, status, headers, config) {
               });
             }
           };
+
 
           $scope.specificPage = function() {
             if(typeof $scope.goToThisPage === 'undefined' || $scope.goToThisPage === ""){}
@@ -81,8 +119,10 @@
               if(typeof $scope.searchText === 'undefined' || $scope.searchText === ""){
                 var response = $http.get('/movies/secret987asdhfqpw8oapi/'+($scope.goToThisPage-1)*100);
                 response.success(function(data, status, headers, config) {
-                  $scope.tableData = data.data;
+                  /*$scope.tableData = data.data;*/
                   $scope.totPages = $scope.Math.ceil(data.totRows/100);
+
+                  sharedDataFactory.setTableData(data.data);
                 });
                 response.error(function(data, status, headers, config) {
                 });
@@ -90,15 +130,31 @@
               else{
                 var response = $http.get('/movies/'+$scope.searchText+'/'+($scope.goToThisPage-1)*100);
                 response.success(function(data, status, headers, config) {
-                  $scope.tableData = data.data;
+                  /*$scope.tableData = data.data;*/
                   $scope.totPages = $scope.Math.ceil(data.totRows/100);
+                  sharedDataFactory.setTableData(data.data);
                 });
                 response.error(function(data, status, headers, config) {
                 });
               }
             }
           };
-        }
+        });
+
+
+        MoviePageModule.controller('tableController', function($scope, $http, sharedDataFactory){
+
+          $scope.$watch(function(){return sharedDataFactory.getTableData();}, function(newVal){
+            if(newVal){$scope.tableData = newVal;}
+          });
+
+          $scope.$watch(function(){return sharedDataFactory.getSearchMoviesOnCurrentPage();}, function(newVal){
+            if(newVal){$scope.searchMoviesOnCurrentPage = newVal;}
+          });
+
+        });
+
+        
       </script>
 	    
 	</div>
