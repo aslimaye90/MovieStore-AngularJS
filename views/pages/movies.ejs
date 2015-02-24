@@ -21,7 +21,7 @@
 
           <span style="float: left; width: 33%">
             <p><b>Search this page: </b></p>
-            <input input type="text" ng-model="search.moviesOnCurrentPage">
+            <input input type="text" ng-model="searchMoviesOnCurrentPage">
           </span>
           
           <span style="float: left; width: 33%">
@@ -92,10 +92,10 @@
 
           init();
 
-          $scope.search = {};
-          $scope.$watch('search.moviesOnCurrentPage', function(newVal){
-            if(newVal){sharedDataFactory.setSearchMoviesOnCurrentPage(newVal);}
-          });
+          $scope.searchMoviesOnCurrentPage = '';
+          $scope.$watch('searchMoviesOnCurrentPage', function(newValue,oldValue) {
+              if (newValue!=oldValue) sharedDataFactory.setSearchMoviesOnCurrentPage(newValue);
+            });
 
           $scope.searchFullDB = function() {
             if(typeof $scope.searchText === 'undefined' || $scope.searchText === ""){}
@@ -148,8 +148,8 @@
             if(newVal){$scope.tableData = newVal;}
           });
 
-          $scope.$watch(function(){return sharedDataFactory.getSearchMoviesOnCurrentPage();}, function(newVal){
-            if(newVal){$scope.searchMoviesOnCurrentPage = newVal;}
+          $scope.$watch(function(){return sharedDataFactory.getSearchMoviesOnCurrentPage();}, function(newValue,oldValue) {
+              if (newValue!=oldValue) $scope.searchMoviesOnCurrentPage = newValue;
           });
 
         });

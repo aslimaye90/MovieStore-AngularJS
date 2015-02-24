@@ -39,14 +39,15 @@
         myApp.controller('ctrl1', function ($scope, Data) {
             $scope.firstName = ''
 
-            $scope.$watch('firstName', function(newVal){
-              if(newVal){Data.setFirstName(newVal);}
+            $scope.$watch('firstName', function(newValue,oldValue) {
+              if (newValue!=oldValue) Data.setFirstName(newValue);
             });
         });
 
         myApp.controller('ctrl2', function ($scope, Data) {
-            $scope.$watch(function(){return Data.getFirstName();}, function(newVal){
-              if(newVal){$scope.firstName = newVal;}
+
+            $scope.$watch(function(){return Data.getFirstName();}, function(newValue,oldValue) {
+                if (newValue!=oldValue) $scope.firstName = newValue;
             });
         });
     </script>
