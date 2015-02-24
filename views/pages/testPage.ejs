@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include ../partials/head %>
+  </head>
+  
+  <body ng-app='myApp'>
+  	
+    <div ng-controller="ctrl1">
+        <input type="text" ng-model="firstName">
+        <br>
+        Input is : <strong>{{firstName}}</strong>
+    </div>
+
+    <div ng-controller="ctrl2">
+        Input should also be here: {{firstName}}
+    </div>
+	  	
+
+    <script>
+        
+        var myApp = angular.module('myApp', []);
+
+        myApp.factory('Data', function () {
+            var data = {
+              FirstName: ''
+            }
+
+            return {
+              getFirstName: function () {
+                  return data.FirstName;
+              },
+              setFirstName: function (x) {
+                  data.FirstName = x;
+              }
+            }
+        });
+
+        myApp.controller('ctrl1', function ($scope, Data) {
+            $scope.firstName = ''
+
+            $scope.$watch('firstName', function(newVal){
+              if(newVal){Data.setFirstName(newVal);}
+            });
+        });
+
+        myApp.controller('ctrl2', function ($scope, Data) {
+            $scope.$watch(function(){return Data.getFirstName();}, function(newVal){
+              if(newVal){$scope.firstName = newVal;}
+            })
+        });
+    </script>
+	    
+  </body>
+
+  <footer>
+        <% include ../partials/footer %>
+  </footer>
+</html>

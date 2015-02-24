@@ -11,4 +11,11 @@ router.get('/', function(req, res) {
   	});
 });
 
+router.get('/testPage', function(req, res){
+  res.render('pages/testPage',
+  	{
+  		title: 'testPage'
+  	});
+});
+
 module.exports = router;
