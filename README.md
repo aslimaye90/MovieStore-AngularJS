@@ -15,10 +15,12 @@ AvailableCopies int,
 category varchar(255)
 );
 
-//now import the file "movies.csv" into MySQL
+/**********now import the file "movies.csv" into MySQL*************/
+
 LOAD DATA LOCAL INFILE '/path/to/csvfile/movies.csv' INTO TABLE Movies FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n';
 
 /****************before starting NodeJS server*****************/
+
 //make changes to the file "routes/MySQLConnectionPool.js"
 
 var pool  = mysql.createPool({
